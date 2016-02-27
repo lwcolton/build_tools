@@ -11,7 +11,7 @@ if [ -z $APP_NAME ]; then
 fi
 container_name="$LOCAL_REPO:$current_branch"
 docker rm -fv $container_name || true
-test_container_id=`docker run --name $container_name -d -w /app ***REMOVED******REMOVED***-calculator:develop /bin/bash -c "while true; do sleep 10; done"`
+test_container_id=`docker run --name $container_name -d -w /app container_name /bin/bash -c "while true; do sleep 10; done"`
 docker cp test-requires $test_container_id:/tmp/test-requires
 docker exec -it "$test_container_id" pip3 install -r /tmp/test-requires
 docker exec -it "$test_container_id" pylint -E $APP_NAME
