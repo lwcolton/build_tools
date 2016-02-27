@@ -1,5 +1,5 @@
 set -e
-. build/set_current_branch.sh
+. build-tools/set_current_branch.sh
 set_current_branch
 if [ -z $APP_NAME ]; then
     echo Need APP_NAME variable
