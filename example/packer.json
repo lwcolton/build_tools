@@ -1,0 +1,76 @@
+{
+  "variables":{
+    "buildkite_message":"{{env `BUILDKITE_MESSAGE`}}"
+  },
+  "builders": [
+    {
+      "type": "docker",
+      "image": "my-repo.dkr.ecr.us-east-1.amazonaws.com/python3-base:latest",
+      "commit": true,
+      "pull": true
+    },
+    {
+        "type": "amazon-ebs",
+        "region": "us-east-1",
+        "source_ami": "ami-111111111",
+        "ami_name": "my-app-{{user `current_branch`}}-{{user `ami_timestamp`}}",
+        "tags":{
+          "Name":"{{user `buildkite_message`}}"
+        },
+        "instance_type": "t2.micro",
+        "ssh_username": "ubuntu",
+        "vpc_id": "vpc-11111111",
+        "subnet_id": "subnet-11111111",
+        "security_group_id":"sg-11111111",
+        "associate_public_ip_address": true,
+        "iam_instance_profile":"",
+        "ssh_private_ip": true,
+        "ssh_pty": true
+    }
+  ],
+  "provisioners": [
+    {
+      "type":"file",
+      "source":"requirements_dir",
+      "destination":"/tmp/"
+    },
+    {
+      "type":"file",
+      "source":"git_requirements.txt",
+      "destination":"/tmp/git_requirements.txt"
+    },
+    {
+      "type":"file",
+      "source":"requirements.txt",
+      "destination":"/tmp/requirements.txt"
+    },
+    {
+      "type":"file",
+      "source":"../src/my_app",
+      "destination":"/tmp/"
+    },
+    {
+      "type":"file",
+      "source":"my-app-upstart.conf",
+      "destination":"/tmp/upstart.conf"
+    },
+    {
+      "type":"file",
+      "source":"install.sh",
+      "destination":"/tmp/install.sh"
+    },
+    {
+        "type": "shell",
+        "inline": "chmod +x /tmp/install.sh && sudo /tmp/install.sh"
+    }
+  ],
+  "post-processors": [
+      {
+        "type": "docker-tag",
+        "only": ["docker"],
+        "repository": "my-app",
+        "tag": "{{user `current_branch`}}",
+        "force": true
+      }
+  ]
+}

@@ -1,0 +1,13 @@
+---
+worker:
+    image: <app image name>
+    links:
+        - "mongo"
+    volumes:
+        - "/home/user/projects/my_app:/app/my_app:ro"
+    working_dir: /app
+    command: python3 -m my_app.worker --log_level=DEBUG
+mongo:
+    image: mongo:3
+    expose: 
+        - 27017
